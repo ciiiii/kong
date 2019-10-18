@@ -11,9 +11,9 @@ echo "*************************************************************************"
 echo "Installing apt dependencies"
 echo "*************************************************************************"
 
-sudo sed -i "s/archive.ubuntu.com/mirrors.163.com/g" /etc/apt/sources.list
-sudo apt update -qq
-sudo apt install make gcc libpcre3-dev libssl-dev perl build-essential curl zlib1g-dev unzip m4 libyaml-dev valgrind -y -qq
+# sudo sed -i "s/archive.ubuntu.com/mirrors.163.com/g" /etc/apt/sources.list
+# sudo apt update -qq
+# sudo apt install make gcc libpcre3-dev libssl-dev perl build-essential curl zlib1g-dev unzip m4 libyaml-dev valgrind -y -qq
 
 echo "*************************************************************************"
 echo "Building openresty"

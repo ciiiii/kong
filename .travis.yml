@@ -1,8 +1,30 @@
 dist: bionic
+language: generic
 
-deploy:
-  provider: script
-  script: bash kong.sh
-  on:
-    tags: false
-    all_branches: true
+sudo: required
+
+addons:
+  apt:
+    packages:
+      - make
+      - gcc
+      - libpcre3-dev
+      - libssl-dev
+      - perl
+      - build-essential
+      - curl
+      - zlib1g-dev
+      - unzip
+      - m4
+      - libyaml-dev
+      - valgrind
+
+after_success: |
+  bash kong.sh
+
+# deploy:
+#   provider: script
+#   script: bash kong.sh
+#   on:
+#     tags: false
+#     all_branches: true
