@@ -73,5 +73,5 @@ if [ -d "/kong" ]; then
 else
     sudo mkdir /kong
 fi
-sudo chown -R "$USER:$(groups)" /kong
+sudo chown -R "travis:travis" /kong
 kong start
