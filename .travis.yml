@@ -1,0 +1,7 @@
+dist: bionic
+
+deploy:
+  provider: script
+  script: bash kong.sh
+  on:
+    all_branches: true
