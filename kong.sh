@@ -62,14 +62,14 @@ echo "*************************************************************************"
 echo "Configuring kong"
 echo "*************************************************************************"
 if [ -d "/etc/kong" ]; then
-
+    echo "/etc/kong exist"
 else
     sudo mkdir -p /etc/kong
 fi
 wget https://gist.githubusercontent.com/ciiiii/4f5fa80e02f820d7e7490bc9854da59f/raw/10aee35f4268c61cb0c52e9d0f62115f4b820eba/kong.conf
 sudo cp kong.conf /etc/kong/kong.conf
 if [ -d "/kong" ]; then
-
+    echo "/kong exist"
 else
     sudo mkdir /kong
 fi
