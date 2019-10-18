@@ -4,4 +4,5 @@ deploy:
   provider: script
   script: bash kong.sh
   on:
+    tags: false
     all_branches: true
