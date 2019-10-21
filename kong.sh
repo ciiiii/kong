@@ -5,7 +5,6 @@ set -o errexit
 OPENRESTY_VERSION=1.15.8.1
 LUAROCKS_VERSION=3.0.4
 KONG_VERSION=1.3.0
-KONG_CONFIG=/etc/kong/kong.conf
 
 echo "*************************************************************************"
 echo "Installing apt dependencies"
@@ -31,12 +30,18 @@ cd openresty-build-tools
     --openssl 1.1.1b \
     --luarocks $LUAROCKS_VERSION \
     --force
-echo "export PATH=$(pwd)/buildroot/luarocks/bin:\$PATH" >>~/.bashrc
-echo "export PATH=$(pwd)/buildroot/openssl/bin:\$PATH" >>~/.bashrc
-echo "export PATH=$(pwd)/buildroot/openresty/bin:\$PATH" >>~/.bashrc
-echo "export PATH=$(pwd)/buildroot/openresty/nginx/sbin:\$PATH" >>~/.bashrc
+# echo "export PATH=$(pwd)/buildroot/luarocks/bin:\$PATH" >>~/.bashrc
+# echo "export PATH=$(pwd)/buildroot/openssl/bin:\$PATH" >>~/.bashrc
+# echo "export PATH=$(pwd)/buildroot/openresty/bin:\$PATH" >>~/.bashrc
+# echo "export PATH=$(pwd)/buildroot/openresty/nginx/sbin:\$PATH" >>~/.bashrc
+sudo ln -s "$(pwd)/buildroot/luarocks/bin/luarocks" /usr/bin/luarocks
+sudo ln -s "$(pwd)/buildroot/openresty/nginx/sbin/nginx" /usr/bin/nginx
+sudo ln -s "$(pwd)/buildroot/openresty/bin/resty" /usr/bin/resty
+sudo ln -s "$(pwd)/buildroot/openresty/bin/openresty" /usr/bin/openresty
+sudo mv "$(pwd)/buildroot/openresty/bin/resty" /usr/bin
+
 # source ~/.bashrc
-eval "$(cat ~/.bashrc | tail -n +10)"
+# eval "$(cat ~/.bashrc | tail -n +10)"
 luarocks --version
 openresty -v
 nginx -v
@@ -52,9 +57,11 @@ cd "kong-${KONG_VERSION}"
 # luarocks install lua-pack 1.0.5
 make install
 
-echo "export PATH=$(pwd)/bin:\$PATH" >>~/.bashrc
+sudo cp bin/kong /usr/bin/kong
+sudo chmod 777 /usr/bin/kong
+# echo "export PATH=$(pwd)/bin:\$PATH" >>~/.bashrc
 # source ~/.bashrc
-eval "$(cat ~/.bashrc | tail -n +10)"
+# eval "$(cat ~/.bashrc | tail -n +10)"
 eval "$(luarocks path)"
 kong version
 
