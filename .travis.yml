@@ -20,5 +20,13 @@ addons:
       - valgrind
       - jq
 
+services:
+  - postgresql
+
+before_script:
+  - psql -c 'create database kong;' -U postgres
+  - psql -c "create user kong with encrypted password 'kong';" -U postgres
+  - psql -c 'grant all privileges on database kong to kong;' -U postgres
+
 after_success: |
   bash kong.sh
