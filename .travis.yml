@@ -4,6 +4,7 @@ language: generic
 sudo: required
 
 addons:
+  postgresql: "11.2"
   apt:
     packages:
       - make
@@ -19,11 +20,17 @@ addons:
       - libyaml-dev
       - valgrind
       - jq
+      - postgresql-11
+      - postgresql-client-11
 
 services:
   - postgresql
 
+before_install:
+  - sudo cp /etc/postgresql/{9.6,11}/main/pg_hba.conf
+  - sudo service postgresql restart 11
 before_script:
+  - psql --version
   - psql -c 'create database kong;' -U postgres
   - psql -c "create user kong with encrypted password 'kong';" -U postgres
   - psql -c 'grant all privileges on database kong to kong;' -U postgres
