@@ -6,26 +6,61 @@ OPENRESTY_VERSION=1.15.8.1
 LUAROCKS_VERSION=3.1.3
 OPENSSL_VERSION=1.1.1b
 KONG_VERSION=1.3.0
+POSTGRES_VERSION=9.6
 
 echo "*************************************************************************"
-echo "Installing apt dependencies"
+echo "Configuring postgres"
 echo "*************************************************************************"
 
-# sudo sed -i "s/archive.ubuntu.com/mirrors.163.com/g" /etc/apt/sources.list
-# sudo apt update -qq
-# sudo apt install make gcc libpcre3-dev libssl-dev perl build-essential curl zlib1g-dev unzip m4 libyaml-dev valgrind -y -qq
+dpkg -f noninteractive --list postgresql-$POSTGRES_VERSION >/dev/null 2>&1
+sudo -E apt-get install postgresql-$POSTGRES_VERSION -qq
+
+sudo sed -i "s/#listen_address.*/listen_addresses '*'/" /etc/postgresql/$POSTGRES_VERSION/main/postgresql.conf
+
+sudo bash -c "cat > /etc/postgresql/$POSTGRES_VERSION/main/pg_hba.conf" <<EOL
+local   all             all                                     trust
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+host    all             all             0.0.0.0/0               trust
+EOL
+
+    sudo systemctl -q enable postgresql
+    sudo /etc/init.d/postgresql restart
+
+    # Create Postgres role and databases
+    psql -U postgres <<EOF
+\x
+CREATE ROLE kong;
+ALTER ROLE kong WITH login;
+CREATE DATABASE kong OWNER kong;
+CREATE DATABASE kong_tests OWNER kong;
+EOF
+
+    psql -d kong -U postgres <<EOF
+\x
+DROP SCHEMA IF EXISTS public CASCADE;
+CREATE SCHEMA IF NOT EXISTS public AUTHORIZATION kong;
+GRANT ALL ON SCHEMA public TO kong;
+EOF
+
+    psql -d kong_tests -U postgres <<EOF
+\x
+DROP SCHEMA IF EXISTS public CASCADE;
+CREATE SCHEMA IF NOT EXISTS public AUTHORIZATION kong;
+GRANT ALL ON SCHEMA public TO kong;
+EOF
+
+fi
 
 echo "*************************************************************************"
 echo "Building openresty"
 echo "*************************************************************************"
 
-sudo su
-
 cd /
 
-git clone https://github.com/Kong/openresty-build-tools.git
+sudo git clone https://github.com/Kong/openresty-build-tools.git
 
-cd openresty-build-tools
+cd /openresty-build-tools
 ./kong-ngx-build \
     -p buildroot \
     --openresty $OPENRESTY_VERSION \
@@ -33,11 +68,11 @@ cd openresty-build-tools
     --luarocks $LUAROCKS_VERSION \
     --force
 
-ln -s "$(pwd)/buildroot/luarocks/bin/luarocks" /usr/bin/luarocks
-ln -s "$(pwd)/buildroot/openresty/nginx/sbin/nginx" /usr/bin/nginx
-ln -s "$(pwd)/buildroot/openresty/bin/resty" /usr/bin/resty
-ln -s "$(pwd)/buildroot/openresty/bin/openresty" /usr/bin/openresty
-mv "$(pwd)/buildroot/openresty/bin/resty" /usr/bin
+sudo ln -s "$(pwd)/buildroot/luarocks/bin/luarocks" /usr/bin/luarocks
+sudo ln -s "$(pwd)/buildroot/openresty/nginx/sbin/nginx" /usr/bin/nginx
+sudo ln -s "$(pwd)/buildroot/openresty/bin/resty" /usr/bin/resty
+sudo ln -s "$(pwd)/buildroot/openresty/bin/openresty" /usr/bin/openresty
+sudo mv "$(pwd)/buildroot/openresty/bin/resty" /usr/bin
 luarocks --version
 openresty -v
 nginx -v
@@ -46,12 +81,12 @@ cd /
 echo "*************************************************************************"
 echo "Installing kong dependencies"
 echo "*************************************************************************"
-wget -O "kong-${KONG_VERSION}.tar.gz" "https://github.com/Kong/kong/archive/${KONG_VERSION}.tar.gz"
+sudo wget -O "kong-${KONG_VERSION}.tar.gz" "https://github.com/Kong/kong/archive/${KONG_VERSION}.tar.gz"
 tar -xvf "kong-${KONG_VERSION}.tar.gz"
 cd "kong-${KONG_VERSION}"
 make install
 
-ln -s "$(pwd)/bin/kong" /usr/bin/kong
+sudo ln -s "$(pwd)/bin/kong" /usr/bin/kong
 eval "$(luarocks path)"
 kong version -vv
 cd /
@@ -62,12 +97,10 @@ echo "*************************************************************************"
 
 sudo mkdir -p /etc/kong
 echo "prefix = /kong/
-pg_host = 192.168.0.36
-pg_password = \"kong\"
 proxy_listen = 0.0.0.0:80, 0.0.0.0:443 ssl
 " >/etc/kong/kong.conf
 
-mkdir /kong
+sudo mkdir /kong
 
 echo "*************************************************************************"
 echo "Configuring systemd"
@@ -92,9 +125,9 @@ PIDFile=/kong/pids/nginx.pid
 [Install]
 WantedBy=multi-user.target" >/etc/systemd/system/kong.service
 
-systemctl daemon-reload
-systemctl enable kong.service
-systemctl start kong.service
+sudo systemctl daemon-reload
+sudo systemctl enable kong.service
+sudo systemctl start kong.service
 sleep 10
 
 res="$(curl localhost 2>/dev/null)"
