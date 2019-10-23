@@ -18,6 +18,7 @@ addons:
       - m4
       - libyaml-dev
       - valgrind
+      - jq
 
 after_success: |
   bash kong.sh
