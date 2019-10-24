@@ -86,7 +86,7 @@ WantedBy=multi-user.target" | sudo tee -a /etc/systemd/system/kong.service >/dev
 
 sudo systemctl daemon-reload
 sudo systemctl enable kong.service
-kong migrations bootstrap
+kong migrations bootstrap -vv
 sudo systemctl start kong.service
 sleep 10
 

@@ -39,3 +39,6 @@ before_script:
 #   bash kong.sh
 script:
   - bash kong.sh
+
+notifications:
+  slack: cyou-tech:1CImRdJdrBQMK7SW3lcyQDIx
