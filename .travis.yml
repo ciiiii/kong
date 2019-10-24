@@ -26,7 +26,8 @@ services:
 
 before_install:
   - sudo apt update
-  - sudo apt -y remove postgresql\*
+  - sudo apt -y remove postgresql-9.*\*
+  - sudo apt -y remove postgresql-10.*\*
   - sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-11 postgresql-client-11
   - sed -e 's/^port.*/port = 5432/' /etc/postgresql/11/main/postgresql.conf > postgresql.conf
   - sudo chown postgres postgresql.conf
