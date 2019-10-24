@@ -34,7 +34,8 @@ before_script:
   # - psql -c 'create database kong;' -U postgres
   # - psql -c "create user kong with encrypted password 'kong';" -U postgres
   # - psql -c 'grant all privileges on database kong to kong;' -U postgres
-  - psql -c 'CREATE USER kong; CREATE DATABASE kong OWNER kong;' -U postgres
+  - psql -c 'CREATE USER kong;' -U postgres
+  - psql -c 'CREATE DATABASE kong OWNER kong;' -U postgres
 
 script:
   - bash kong.sh
