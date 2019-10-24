@@ -54,12 +54,13 @@ echo "*************************************************************************"
 
 sudo mkdir -p /etc/kong
 echo "prefix = /kong/
-pg_password = \"kong\"
 proxy_listen = 0.0.0.0:80, 0.0.0.0:443 ssl
 " | sudo tee -a /etc/kong/kong.conf >/dev/null
 
 sudo mkdir /kong
 sudo chown -R "travis:travis" /kong
+
+kong migrations bootstrap -vv
 
 echo "*************************************************************************"
 echo "Configuring systemd"
@@ -86,7 +87,6 @@ WantedBy=multi-user.target" | sudo tee -a /etc/systemd/system/kong.service >/dev
 
 sudo systemctl daemon-reload
 sudo systemctl enable kong.service
-kong migrations bootstrap -vv
 sudo systemctl start kong.service
 sleep 10
 
