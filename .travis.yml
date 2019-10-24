@@ -22,8 +22,7 @@ addons:
 
 before_install:
   - sudo service postgresql stop
-  - sudo apt-get --yes remove postgresql-10-postgis-2.4
-  - sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-11-postgis-2.5-scripts postgresql-11 postgresql-client-11 postgresql-11-postgis-2.5
+  - sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-11 postgresql-client-11
   - sed -e 's/^port.*/port = 5432/' /etc/postgresql/11/main/postgresql.conf > postgresql.conf
   - sudo chown postgres postgresql.conf
   - sudo mv postgresql.conf /etc/postgresql/11/main
@@ -36,5 +35,7 @@ before_script:
   - psql -c "create user kong with encrypted password 'kong';" -U postgres
   - psql -c 'grant all privileges on database kong to kong;' -U postgres
 
-after_success: |
-  bash kong.sh
+# after_success: |
+#   bash kong.sh
+script:
+  - bash kong.sh

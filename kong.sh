@@ -16,6 +16,7 @@ cd /
 sudo git clone https://github.com/Kong/openresty-build-tools.git
 
 cd /openresty-build-tools
+sudo chown -R "travis:travis" /openresty-build-tools
 ./kong-ngx-build \
     -p buildroot \
     --openresty $OPENRESTY_VERSION \
@@ -38,6 +39,7 @@ echo "Installing kong dependencies"
 echo "*************************************************************************"
 sudo wget -O "kong-${KONG_VERSION}.tar.gz" "https://github.com/Kong/kong/archive/${KONG_VERSION}.tar.gz"
 tar -xvf "kong-${KONG_VERSION}.tar.gz"
+sudo chown -R "travis:travis" "kong-${KONG_VERSION}"
 cd "kong-${KONG_VERSION}"
 make install
 
@@ -54,9 +56,10 @@ sudo mkdir -p /etc/kong
 echo "prefix = /kong/
 pg_password = \"kong\"
 proxy_listen = 0.0.0.0:80, 0.0.0.0:443 ssl
-" >/etc/kong/kong.conf
+" | sudo tee -a /etc/kong/kong.conf >/dev/null
 
 sudo mkdir /kong
+sudo chown -R "travis:travis" /kong
 
 echo "*************************************************************************"
 echo "Configuring systemd"
@@ -79,7 +82,7 @@ ExecStop=/usr/bin/kong stop -v
 PIDFile=/kong/pids/nginx.pid
 
 [Install]
-WantedBy=multi-user.target" >/etc/systemd/system/kong.service
+WantedBy=multi-user.target" | sudo tee -a /etc/systemd/system/kong.service >/dev/null
 
 sudo systemctl daemon-reload
 sudo systemctl enable kong.service
