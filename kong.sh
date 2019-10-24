@@ -92,3 +92,11 @@ sleep 10
 
 res="$(curl localhost 2>/dev/null)"
 echo $res
+
+echo "*************************************************************************"
+echo "Configuring custom plugins"
+echo "*************************************************************************"
+sudo git clone https://github.com/Kong/kong-plugin.git
+sudo systemctl reload kong.service
+
+curl -s localhost:8001 | jq .plugins
