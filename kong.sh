@@ -38,7 +38,7 @@ echo "*************************************************************************"
 echo "Installing kong dependencies"
 echo "*************************************************************************"
 sudo wget -O "kong-${KONG_VERSION}.tar.gz" "https://github.com/Kong/kong/archive/${KONG_VERSION}.tar.gz"
-tar -xvf "kong-${KONG_VERSION}.tar.gz"
+sudo tar -xvf "kong-${KONG_VERSION}.tar.gz"
 sudo chown -R "travis:travis" "kong-${KONG_VERSION}"
 cd "kong-${KONG_VERSION}"
 make install
