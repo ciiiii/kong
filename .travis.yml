@@ -4,6 +4,7 @@ language: generic
 sudo: required
 
 addons:
+  postgresql: "11.2"
   apt:
     packages:
       - make
@@ -20,20 +21,21 @@ addons:
       - valgrind
       - jq
 
+services:
+  - postgresql
+
 before_install:
-  - sudo service postgresql stop
+  - sudo apt update
+  - sudo apt -y remove postgresql\*
   - sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-11 postgresql-client-11
   - sed -e 's/^port.*/port = 5432/' /etc/postgresql/11/main/postgresql.conf > postgresql.conf
   - sudo chown postgres postgresql.conf
   - sudo mv postgresql.conf /etc/postgresql/11/main
-  - sudo cp /etc/postgresql/{10,11}/main/pg_hba.conf
+  - sudo cp /etc/postgresql/11/main/pg_hba.conf
   - sudo service postgresql restart 11
 before_script:
   - export PATH="/usr/lib/postgresql/11/bin:$PATH"
   - psql --version
-  # - psql -c 'create database kong;' -U postgres
-  # - psql -c "create user kong with encrypted password 'kong';" -U postgres
-  # - psql -c 'grant all privileges on database kong to kong;' -U postgres
   - psql -c 'SELECT version();' -U postgres
   - psql -c 'CREATE USER kong;' -U postgres
   - psql -c 'CREATE DATABASE kong OWNER kong;' -U postgres
