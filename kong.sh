@@ -66,7 +66,7 @@ echo "Configuring systemd"
 echo "*************************************************************************"
 
 export LUAROCKS_PREFIX=$(pwd)/openresty-build-tools/buildroot/luarocks
-echo "LUA_PATH=\"${LUAROCKS_PREFIX}/share/lua/5.1/?.lua;;${LUAROCKS_PREFIX}/share/lua/5.1/?/init.lua;/kong-plugin/?.lua;/kong-plugin/?/init.lua\"" >/etc/systemd/system/kong.env
+echo "LUA_PATH=\"${LUAROCKS_PREFIX}/share/lua/5.1/?.lua;;${LUAROCKS_PREFIX}/share/lua/5.1/?/init.lua;/kong-plugin/?.lua;/kong-plugin/?/init.lua\"" | sudo tee -a /etc/systemd/system/kong.env >/dev/null
 
 echo "[Unit]
 Description=kong
@@ -86,6 +86,7 @@ WantedBy=multi-user.target" | sudo tee -a /etc/systemd/system/kong.service >/dev
 
 sudo systemctl daemon-reload
 sudo systemctl enable kong.service
+kong migrations bootstrap
 sudo systemctl start kong.service
 sleep 10
 
