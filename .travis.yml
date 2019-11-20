@@ -24,13 +24,14 @@ addons:
 
 before_install:
   # - sudo apt update
-  - sudo service postgresql stop
+  - sudo service postgresql stop 9
+  - sudo service postgresql stop 10
   - sed -e 's/^port.*/port = 5432/' /etc/postgresql/11/main/postgresql.conf > postgresql.conf
   - sudo chown postgres postgresql.conf
   - sudo mv postgresql.conf /etc/postgresql/11/main
   - sudo cp /etc/postgresql/{10,11}/main/pg_hba.conf
-  # - sudo apt -y remove postgresql-9.*\*
-  # - sudo apt -y remove postgresql-10.*\*
+  - sudo apt -y remove postgresql-9.*\*
+  - sudo apt -y remove postgresql-10.*\*
   - sudo service postgresql restart 11
 before_script:
   - export PATH="/usr/lib/postgresql/11/bin:$PATH"
