@@ -4,7 +4,6 @@ language: generic
 sudo: required
 
 addons:
-  postgresql: "11.2"
   apt:
     packages:
       - make
@@ -20,19 +19,18 @@ addons:
       - libyaml-dev
       - valgrind
       - jq
-
-services:
-  - postgresql
+      - postgresql-11
+      - postgresql-client-11
 
 before_install:
-  - sudo apt update
-  - sudo apt -y remove postgresql-9.*\*
-  - sudo apt -y remove postgresql-10.*\*
-  - sudo apt install -yq --no-install-suggests --no-install-recommends postgresql-11 postgresql-client-11
+  # - sudo apt update
+  - sudo service postgresql stop
   - sed -e 's/^port.*/port = 5432/' /etc/postgresql/11/main/postgresql.conf > postgresql.conf
   - sudo chown postgres postgresql.conf
   - sudo mv postgresql.conf /etc/postgresql/11/main
   - sudo cp /etc/postgresql/{10,11}/main/pg_hba.conf
+  # - sudo apt -y remove postgresql-9.*\*
+  # - sudo apt -y remove postgresql-10.*\*
   - sudo service postgresql restart 11
 before_script:
   - export PATH="/usr/lib/postgresql/11/bin:$PATH"
